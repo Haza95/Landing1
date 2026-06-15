@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Consulta QR1</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f5f5f5;
+padding:20px;
+text-align:center;
+}
+
+#reader{
+max-width:350px;
+margin:auto;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+box-shadow:0 2px 10px rgba(0,0,0,.15);
+text-align:left;
+}
+
+button{
+padding:10px 15px;
+border:none;
+background:#003366;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Consulta QR1</h1>
+
+<div id="reader"></div>
+
+<div id="resultado"></div>
+
+<script>
+
+let scanner;
+
+function iniciarScanner(){
+
+scanner = new Html5QrcodeScanner(
+"reader",
+{
+fps:10,
+qrbox:250
+}
+);
+
+scanner.render(onScanSuccess);
+
+}
+
+function onScanSuccess(decodedText){
+
+scanner.clear();
+
+consultar(decodedText.trim());
+
+}
+
+function consultar(id){
+
+document.getElementById("resultado").innerHTML =
+"<div class='card'>Consultando...</div>";
+
+fetch(
+"https://script.google.com/macros/s/AKfycbz5zYZH2ZwIHOXJCt2L1m5mwpwW5GvCqS5h0zwh-FWZnKj5y3xr66fwJ4Toh_6nXx7V/exec?id=" +
+encodeURIComponent(id)
+)
+
+.then(r=>r.json())
+
+.then(data=>{
+
+// mostrar datos
+
+});
+
+}
+
+.then(r=>r.json())
+
+.then(data=>{
+
+if(!data.encontrado){
+
+document.getElementById("resultado").innerHTML=
+`
+<div class="card">
+<h2>No encontrado</h2>
+<p>${id}</p>
+<button onclick="location.reload()">
+Escanear otro
+</button>
+</div>
+`;
+
+return;
+
+}
+
+document.getElementById("resultado").innerHTML=
+`
+<div class="card">
+
+<h2>${data.activo}</h2>
+
+<p><b>ID:</b> ${data.id}</p>
+
+<p><b>Cliente:</b> ${data.cliente}</p>
+
+<p><b>Contrato:</b> ${data.contrato}</p>
+
+<p><b>Estatus:</b> ${data.estatus}</p>
+
+<button onclick="location.reload()">
+Escanear otro
+</button>
+
+</div>
+`;
+
+});
+
+}
+
+iniciarScanner();
+
+</script>
+
+</body>
+</html>
